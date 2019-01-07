@@ -26,7 +26,7 @@ import boto3
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy.streaming import StreamListener
-
+from pytz import timezone
 
 # Set up project path
 projectPath = os.getcwd()
@@ -143,6 +143,8 @@ class StdOutListener(StreamListener):
 
     def on_data(self, data):
 
+        fmt = "%Y-%m-%d %H:%M:%S"
+
         try:
             all_data = json.loads(data)
             tw_data = {}
@@ -166,7 +168,7 @@ class StdOutListener(StreamListener):
 
                     # print(all_data)
 
-                    tw_data['timestamp'] = f"{datetime.now():%Y-%m-%d  %H:%M:%S}"
+                    tw_data['timestamp'] =  datetime.now(timezone('US/Eastern')).strftime(fmt) f"{datetime.now():%Y-%m-%d  %H:%M:%S}"
                     tw_data['status_id'] = str(all_data["id"])
 
                     tw_data['retweet_count'] = str(all_data['retweet_count'])
