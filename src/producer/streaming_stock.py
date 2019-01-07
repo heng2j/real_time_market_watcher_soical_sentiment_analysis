@@ -155,16 +155,16 @@ def main(client, stream_name):
 
 
 if __name__ == '__main__':
-    # Set up argument parser
-    parser = ArgumentParser()
-    parser.add_argument("-sn", "--streamName", help="Input Stream Name", required=True)
-    args = parser.parse_args()
-
-    # Assign input, output files and number of lines variables from command line arguments
-    stream_name = args.streamName
+    # # Set up argument parser
+    # parser = ArgumentParser()
+    # parser.add_argument("-sn", "--streamName", help="Input Stream Name", required=True)
+    # args = parser.parse_args()
+    #
+    # # Assign input, output files and number of lines variables from command line arguments
+    # stream_name = args.streamName
 
     client = boto3.client('kinesis')
 
-    # stream_name = 'StockTradeStream'
+    stream_name = 'StockTradeStream'
 
     main(client, stream_name)

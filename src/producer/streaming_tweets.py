@@ -1,9 +1,26 @@
+#!/usr/bin/env python3
+# streaming_tweets.py
+# ---------------
+# Author: Zhongheng Li
+# Start Date: 01-03-19
+# Last Modified Date: 01-06-19
+
+
+"""
+This code stream real time tweets data to AWS Kinesis
+
+"""
+
+# System modules
+
 from __future__ import absolute_import, print_function
 
 import json
 import time
 from datetime import datetime
 import configparser
+import os
+from os.path import dirname as up
 
 import boto3
 from tweepy import OAuthHandler
@@ -11,9 +28,13 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 
 
+# Set up project path
+projectPath = os.getcwd()
+
+configs_ini_file_path = "/configs.ini"
 
 config = configparser.ConfigParser()
-config.read('../../configs.ini')
+config.read(projectPath + configs_ini_file_path)
 
 # Go to http://apps.twitter.com and create an app.
 # The consumer key and secret will be generated for you after
