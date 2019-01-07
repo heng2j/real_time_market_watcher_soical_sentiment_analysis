@@ -19,7 +19,7 @@ from argparse import ArgumentParser
 
 # 3rd party modules
 import boto3
-from boto.kinesis.exceptions import ProvisionedThroughputExceededException
+from botocore.exceptions import ClientError
 
 
 class KinesisConsumer:
@@ -63,7 +63,7 @@ class KinesisConsumer:
             
                 next_iterator = response['NextShardIterator']
                 time.sleep(self.sleep_interval)
-            except ProvisionedThroughputExceededException as ptee:
+            except ClientError as ptee:
                 time.sleep(1)
 
 
