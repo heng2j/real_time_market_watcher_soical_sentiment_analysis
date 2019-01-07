@@ -12,7 +12,6 @@ This code stream real time tweets data to AWS Kinesis
 """
 
 # System modules
-
 from __future__ import absolute_import, print_function
 
 import json
@@ -23,6 +22,7 @@ import os
 from os.path import dirname as up
 
 import boto3
+from botocore.exceptions import ClientError
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy.streaming import StreamListener
@@ -168,7 +168,7 @@ class StdOutListener(StreamListener):
 
                     # print(all_data)
 
-                    tw_data['timestamp'] =  datetime.now(timezone('US/Eastern')).strftime(fmt) f"{datetime.now():%Y-%m-%d  %H:%M:%S}"
+                    tw_data['timestamp'] =  datetime.now(timezone('US/Eastern')).strftime(fmt)
                     tw_data['status_id'] = str(all_data["id"])
 
                     tw_data['retweet_count'] = str(all_data['retweet_count'])
