@@ -93,7 +93,6 @@ if __name__ == '__main__':
     table = dynamodb.Table('StockNews')
 
     while True:
-
         for symbol in symbolsList:
 
             latest_news_list = pyEX.news(symbol, count=10)
@@ -123,6 +122,6 @@ if __name__ == '__main__':
                     if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                         raise
 
-        time.sleep(900)
+        time.sleep(10)
 
 

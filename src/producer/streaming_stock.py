@@ -13,16 +13,18 @@ This code stream real time stock data to AWS Kinesis
 
 # System modules
 from __future__ import absolute_import, print_function
+from argparse import ArgumentParser
 
 # 3rd party modules
 import json
 import time
-from argparse import ArgumentParser
-from datetime import datetime
-
-import boto3
 import pyEX
+import boto3
+
+from datetime import datetime
 from pytz import timezone
+
+
 
 symbolsList = ['AAPL',
                'AMZN',
@@ -74,8 +76,9 @@ symbolsList = ['AAPL',
                'XOM',
                'XRX']
 
+def main(client,stream_name):
 
-def main(client, stream_name):
+
     fmt = "%Y-%m-%d %H:%M:%S"
 
     stocks_hist = {}
@@ -129,8 +132,7 @@ def main(client, stream_name):
                     stock_data['movementVolume'] = 0
                 else:
                     stock_data['movementPrice'] = (
-                                                      latest_quote['latestPrice'] - stocks_hist[symbol][
-                                                          'previous_price']) / \
+                                                  latest_quote['latestPrice'] - stocks_hist[symbol]['previous_price']) / \
                                                   stocks_hist[symbol]['previous_price']
                     stock_data['movementVolume'] = (latest_quote['latestVolume'] - stocks_hist[symbol][
                         'previous_volume']) / stocks_hist[symbol]['previous_volume']
@@ -155,16 +157,19 @@ def main(client, stream_name):
 
 
 if __name__ == '__main__':
-    # # Set up argument parser
-    # parser = ArgumentParser()
-    # parser.add_argument("-sn", "--streamName", help="Input Stream Name", required=True)
-    # args = parser.parse_args()
-    #
-    # # Assign input, output files and number of lines variables from command line arguments
-    # stream_name = args.streamName
+
+    # Set up argument parser
+    parser = ArgumentParser()
+    parser.add_argument("-sn", "--streamName", help="Input Stream Name", required=True)
+    args = parser.parse_args()
+
+    # Assign input, output files and number of lines variables from command line arguments
+    stream_name = args.streamName
+
 
     client = boto3.client('kinesis')
 
-    stream_name = 'StockTradeStream'
+    # stream_name = 'StockTradeStream'
 
     main(client, stream_name)
+
