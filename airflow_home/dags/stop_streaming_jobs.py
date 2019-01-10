@@ -23,7 +23,7 @@ with DAG('stop_streaming_jobs_dag',
 
 
     opr_init_msg = BashOperator(task_id='init_msg',
-                             bash_command='echo "Stopping Streaming_processes!!"')
+                             bash_command='echo Stopping Streaming_processes!! ')
 
     opr_kill_kinesis_streams_jobs = BashOperator(task_id='kill_kinesis_streams_jobs',
                              bash_command='cd $stock_sentiment_analysis_PATH && bash kill_streaming_jobs.sh ')
@@ -33,7 +33,7 @@ with DAG('stop_streaming_jobs_dag',
         bash_command='sleep 5')
 
     opr_stop_kinesis_streams = BashOperator(task_id='stop_kinesis_streams',
-                             bash_command='cd $stock_sentiment_analysis_PATH sh stop_streams.sh ')
+                             bash_command='cd $stock_sentiment_analysis_PATH && sh stop_streams.sh ')
 
 
 opr_init_msg >> opr_kill_kinesis_streams_jobs >> opr_sleep_5 >> opr_stop_kinesis_streams
