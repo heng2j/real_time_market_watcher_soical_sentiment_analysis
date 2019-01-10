@@ -3,3 +3,5 @@
 .idea/
 configs.ini
 *.out
+consume_news_save_pid.txt
+save_pid.txt

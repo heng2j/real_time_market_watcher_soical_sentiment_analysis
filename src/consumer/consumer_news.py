@@ -95,10 +95,11 @@ if __name__ == '__main__':
     while True:
         for symbol in symbolsList:
 
-            latest_news_list = pyEX.news(symbol, count=10)
+            latest_news_list = pyEX.news(symbol, count=100)
 
             for news_data in latest_news_list:
                 news_item = {}
+
 
                 news_item['datetime'] = '{0:%Y-%m-%d %H:%M:%S}'.format(parser.parse(news_data['datetime']))
                 news_item['symbol'] = symbol
