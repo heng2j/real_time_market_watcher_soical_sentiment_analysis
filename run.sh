@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd `pwd`
 
 # streaming_tweets
 echo 'streaming_tweets.py: ' > save_pid.txt
