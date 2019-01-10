@@ -9,7 +9,8 @@ while read -r line
 do
     readLine=$line
 
-    if [[ "$readLine" =~ ^[0-9]+$ ]]
+    if [[ "$readLine" =~ ^[0-9]+$ ]];
+    
 
         then
                 kill -9 "$readLine"
