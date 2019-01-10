@@ -10,10 +10,9 @@ do
     readLine=$line
 
     if [[ "$readLine" =~ ^[0-9]+$ ]];
-    
 
         then
-                kill -9 "$readLine"
+                kill -9 "$readLine" ;
 
     fi
 done < "$filename"
