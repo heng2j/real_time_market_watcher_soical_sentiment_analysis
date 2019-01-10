@@ -1,6 +1,6 @@
 #!/bin/bash
 
-$stock_sentiment_analysis_PATH
+cd $stock_sentiment_analysis_PATH
 
 filename="save_pid.txt"
 
