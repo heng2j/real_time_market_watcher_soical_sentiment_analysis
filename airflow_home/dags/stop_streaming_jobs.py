@@ -15,7 +15,7 @@ with DAG('stop_streaming_jobs_dag',
          catchup=False,
          default_args=default_args,
          # Set for testing purpose to run in every 2 minutes
-         schedule_interval='30 16 * * *' ,
+         schedule_interval='30 16 * * 1-5',
          # Should run daily at 11:00 pm
          # schedule_interval='0 30 23 * * ?',
          ) as dag:
