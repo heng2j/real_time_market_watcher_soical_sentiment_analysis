@@ -1,0 +1,9 @@
+/env
+.DS_Store
+.idea/
+configs.ini
+*.out
+consume_news_save_pid.txt
+save_pid.txt
+airflow_home/dags/__pycache__/
+airflow_home/airflow-webserver.pid
