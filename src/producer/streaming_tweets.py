@@ -28,10 +28,15 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 from pytz import timezone
 
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyzer = SentimentIntensityAnalyzer()
+
 # Set up project path
 projectPath = os.getcwd()
 
 configs_ini_file_path = "/configs.ini"
+
+
 
 config = configparser.ConfigParser()
 config.read(projectPath + configs_ini_file_path)
@@ -129,7 +134,8 @@ tracking_list = ['#AAPL',
                  '#BDCL',
                  '#GJO',
                  '#XOM',
-                 '#XRX']
+                 '#XRX',
+                 '#Google']
 
 
 class StdOutListener(StreamListener):
@@ -184,6 +190,21 @@ class StdOutListener(StreamListener):
                     tw_data['user_followers_count'] = str(all_data['user']['followers_count'])
                     tw_data['user_listed_count'] = str(all_data['user']['listed_count'])
                     tw_data['hashtags'] = str(all_data['entities']['hashtags'])
+
+                    # Get Sentiment Score
+                    """
+                    Sentiment Score are getting from vaderSentiment
+                    
+                    Reference: https://github.com/cjhutto/vaderSentiment#about-the-scoring 
+                    
+                    positive sentiment: compound score >= 0.05
+                    neutral sentiment: (compound score > -0.05) and (compound score < 0.05)
+                    negative sentiment: compound score <= -0.05
+                    
+                    """
+
+                    tw_data['sentiment_score'] = analyzer.polarity_scores(tw_data['text']).get('compound')
+
 
                     print('Putting this record to stream: ', tw_data)
 

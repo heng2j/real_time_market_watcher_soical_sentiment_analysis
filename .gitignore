@@ -1,4 +1,5 @@
 /env
+src/DB/
 .DS_Store
 .idea/
 configs.ini

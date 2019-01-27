@@ -115,6 +115,7 @@ def main(client,stream_name):
                 stock_data['low'] = latest_quote['low']
                 stock_data['latestPrice'] = latest_quote['latestPrice']
                 stock_data['latestSource'] = latest_quote['latestSource']
+                # time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(1505779200000/1000))
                 stock_data['latestTime'] = datetime.now(timezone('US/Eastern')).strftime(fmt)
                 stock_data['latestVolume'] = latest_quote['latestVolume']
                 stock_data['previousClose'] = latest_quote['previousClose']
