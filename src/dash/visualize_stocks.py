@@ -101,7 +101,7 @@ def update_graph(interval):
     Queries table, analyzes data, and assembles results in Dash format.
     """
     # TODO: Replace hardcoded results with dcc callbacks
-    df_stocks = query_dynamodb_stocks("AAPL", "2019-01-03 15:05:44", "15")
+    df_stocks = query_dynamodb_stocks("AAPL", "2019-01-03 15:05:44", 15)
 
     # Creates scatter data for real-time graph
     plot_stocks = go.Scatter(x = df_stocks["latestTime"],
