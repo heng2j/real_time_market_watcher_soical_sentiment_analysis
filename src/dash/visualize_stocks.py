@@ -10,6 +10,7 @@ import boto3 as boto3
 import dash as da
 import dash.dependencies as dep
 import dash_core_components as dcc
+
 import dash_html_components as html
 import datetime as dt
 import os
@@ -93,8 +94,8 @@ def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
     return df_stocks
 
 # Callback updates graph (OUTPUT) according to time interval (INPUT)
-@app.callback(Output("sentiment_volume_change", "figure_sentiment1"),
-              [Input("real_time_updates", "n_intervals")])
+@app.callback(dep.Output("sentiment_volume_change", "figure_sentiment1"),
+              [dep.Input("real_time_updates", "n_intervals")])
 def update_graph(interval):
     """
     Queries table, analyzes data, and assembles results in Dash format.
