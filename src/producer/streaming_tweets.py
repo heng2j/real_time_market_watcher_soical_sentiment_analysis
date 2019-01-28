@@ -135,8 +135,7 @@ tracking_list = ['#AAPL',
                  '#GJO',
                  '#XOM',
                  '#XRX',
-                 '#Google',
-                 '#NBA']
+                 '#Google']
 
 
 class StdOutListener(StreamListener):
