@@ -108,15 +108,15 @@ def main(client,stream_name):
                 stock_data['companyName'] = latest_quote['companyName']
                 stock_data['primaryExchange'] = latest_quote['primaryExchange']
                 stock_data['sector'] = latest_quote['sector']
-                stock_data['calculationPrice'] = latest_quote['calculationPrice']
+                # stock_data['calculationPrice'] = latest_quote['calculationPrice']
                 stock_data['open'] = latest_quote['open']
                 stock_data['close'] = latest_quote['close']
                 stock_data['high'] = latest_quote['high']
                 stock_data['low'] = latest_quote['low']
                 stock_data['latestPrice'] = latest_quote['latestPrice']
                 stock_data['latestSource'] = latest_quote['latestSource']
-                # time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(1505779200000/1000))
-                stock_data['latestTime'] = datetime.now(timezone('US/Eastern')).strftime(fmt)
+
+                stock_data['latestTime'] = time.strftime('%m/%d/%Y %H:%M:%S',time.gmtime(latest_quote['latestUpdate']/1000)) # datetime.now(timezone('US/Eastern')).strftime(fmt)
                 stock_data['latestVolume'] = latest_quote['latestVolume']
                 stock_data['previousClose'] = latest_quote['previousClose']
                 stock_data['change'] = latest_quote['change']

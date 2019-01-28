@@ -33,7 +33,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 
 # Internal Modules
-from src.models import tweet
+from src.models import tweet, trade
 from src.data_tools import getSQL_DB_Engine
 
 
@@ -105,8 +105,15 @@ class saveStreamDataToDynamoDB(KinesisConsumer):
             all_data = json.loads(json.dumps(all_data), parse_float=Decimal)
 
 
-            print("all_data: ", all_data)
-            stmt = pg_insert(tweet).values(all_data)
+            if stream_name == 'TweetsStream':
+                stmt = pg_insert(tweet).values(all_data)
+            elif  stream_name == 'StockTradeStream':
+
+                all_data_lower = {k.casefold(): v for k, v in all_data.items()}
+
+                print(all_data_lower)
+                stmt = pg_insert(trade).values(all_data_lower)
+
 
 
             try:
