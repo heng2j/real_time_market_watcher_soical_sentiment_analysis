@@ -1,10 +1,16 @@
 """
+STOCK VISUALIZATION
 
+Shows stocks
+
+TODO: Replace hard-coded ranges with interactive objects in LAYOUT and UPDATE GRAPH
+TODO: Make new figure for TOTAL SENTIMENT for selected stocks
 """
 
 
 ## IMPORTED LIBRARIES
 
+# Generate interactive figures using PLOTLY DASH libraries
 import dash as da
 import dash.dependencies as dep
 import dash_core_components as dcc
@@ -27,7 +33,7 @@ import sqlalchemy as sqla
 import textwrap as tw
 
 
-## GLOBAL PARAMETERS
+## GLOBAL DEFINITIONS
 PSQL_USER = os.environ["HENG_TIMESCALE_DB_USER"]
 PSQL_PASS = os.environ["HENG_TIMESCALE_DB_PASS"]
 PSQL_HOST = os.environ["HENG_TIMESCALE_DB_HOST"]
@@ -39,10 +45,12 @@ psql = sqla \
        .create_engine(f"postgresql+psycopg2://{PSQL_USER}:{PSQL_PASS}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_NAME}") \
        .connect()
 
-# Sets Dash application parameters
+# Set Dash application parameters
 app = da.Dash("Charge_Tracker",
               external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"])
 server = app.server
+
+# Set Dash HTML layout
 app.layout = html.Div([
     html.Div([
         dcc.Markdown(tw.dedent("""
@@ -70,7 +78,6 @@ app.layout = html.Div([
 )
 
 ## FUNCTION DEFINITIONS
-
 def query_postgres_stocks(symbol, start_datetime, end_datetime):
     """
     Queries PostgreSQL/TimescaleDB database according to input query parameters.
@@ -94,17 +101,18 @@ def query_postgres_stocks(symbol, start_datetime, end_datetime):
             .format(symbol, start_datetime, end_datetime)
     result = psql.execute(query)
 
+    # Transforms query result generator into dataframe
     df_stocks = pd.DataFrame([i for i in result])
     df_stocks.columns = ["symbol", "companyName", "latestTime", "movementVolume"]
 
     return df_stocks
 
-# Callback updates graph (OUTPUT) according to time interval (INPUT)
 @app.callback(dep.Output("sentiment_volume_change", "figure"),
               [dep.Input("real_time_updates", "n_intervals")])
 def update_graph(interval):
     """
     Queries table, analyzes data, and assembles results in Dash format.
+    Callback updates graph (OUTPUT) according to time interval (INPUT)
     """
     # TODO: Replace hardcoded results with dcc callbacks
     df_stocks = query_postgres_stocks("BA", "2019-01-28 18:05:03-05", "2019-01-28 19:00:00-05")
