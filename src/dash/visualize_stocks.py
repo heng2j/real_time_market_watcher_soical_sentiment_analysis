@@ -69,8 +69,8 @@ def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
     start_datetime = end_datetime - dt.timedelta(minutes=window_minutes)
 
     # Convert start and end datetimes to formatted string representation
-    start_datetime = start_datetime.strptime("%Y-%m-%d %H:%M:%S")
-    end_datetime = end_datetime.strptime("%Y-%m-%d %H:%M:%S")
+    start_datetime = start_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    end_datetime = end_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
     # Collect query result
     result = dynamodb.query(TableName = "StockTradesProcessor",
