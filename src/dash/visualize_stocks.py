@@ -94,7 +94,10 @@ def query_postgres_stocks(symbol, start_datetime, end_datetime):
             .format(symbol, start_datetime, end_datetime)
     result = psql.execute(query)
 
-    return pd.DataFrame([i for i in result])
+    df_stocks = pd.DataFrame([i for i in result])
+    df_stocks.columns = ["symbol", "companyName", "latestTime", "movementVolume"]
+
+    return df_stocks
 
 # Callback updates graph (OUTPUT) according to time interval (INPUT)
 @app.callback(dep.Output("sentiment_volume_change", "figure"),
