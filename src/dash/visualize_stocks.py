@@ -42,7 +42,7 @@ app.layout = html.Div([
             """)),
         dcc.Graph(
             id="sentiment_volume_change",
-            figure="figure_sentiment1"),
+            figure="figure"),
         dcc.Interval(
             id="real_time_updates",
             interval=60000,
@@ -94,7 +94,7 @@ def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
     return df_stocks
 
 # Callback updates graph (OUTPUT) according to time interval (INPUT)
-@app.callback(dep.Output("sentiment_volume_change", "figure_sentiment1"),
+@app.callback(dep.Output("sentiment_volume_change", "figure"),
               [dep.Input("real_time_updates", "n_intervals")])
 def update_graph(interval):
     """
