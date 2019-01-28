@@ -111,7 +111,7 @@ class saveStreamDataToDynamoDB(KinesisConsumer):
 
                 all_data_lower = {k.casefold(): v for k, v in all_data.items()}
 
-                print(all_data_lower)
+                # print(all_data_lower)
                 stmt = pg_insert(trade).values(all_data_lower)
 
 
