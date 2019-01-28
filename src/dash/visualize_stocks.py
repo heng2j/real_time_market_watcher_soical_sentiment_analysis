@@ -146,4 +146,4 @@ def update_graph(interval):
 if __name__ == "__main__":
     app.run_server(debug = False,
                    host = "0.0.0.0",
-                   port = 80)
+                   port = 5000)
