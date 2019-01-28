@@ -15,10 +15,25 @@ This code
 from decimal import Decimal
 import time
 import json
+import sys
+import os
+from os.path import dirname as up
+
+
+# projectPath = up(os.getcwd())
+src_path = up(up(os.getcwd()))
+sys.path.append(src_path)
 
 # 3rd party modules
 import boto3
 from boto.kinesis.exceptions import ProvisionedThroughputExceededException
+
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+
+
+# Internal Modules
+from src.models import tweet
+from src.data_tools import getSQL_DB_Engine
 
 
 
@@ -93,6 +108,15 @@ class EchoConsumer(KinesisConsumer):
 
             all_data = json.loads(json.dumps(all_data), parse_float=Decimal)
 
+            stmt = pg_insert(tweet).values(all_data)
+
+            try:
+                r = DB_engine.execute(stmt)
+            except Exception as e:
+
+                if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
+                    raise
+
 
             dynamodb = boto3.resource('dynamodb')
             table = dynamodb.Table(self.table_name)
@@ -115,6 +139,8 @@ class EchoConsumer(KinesisConsumer):
 
 if __name__ == '__main__':
 
+
+    DB_engine = getSQL_DB_Engine()
 
     kinesis = boto3.client('kinesis')
     stream_name = 'TweetsStream'

@@ -135,7 +135,8 @@ tracking_list = ['#AAPL',
                  '#GJO',
                  '#XOM',
                  '#XRX',
-                 '#Google']
+                 '#Google',
+                 '#NBA']
 
 
 class StdOutListener(StreamListener):
@@ -175,7 +176,7 @@ class StdOutListener(StreamListener):
                     # print(all_data)
 
                     tw_data['timestamp'] =  datetime.now(timezone('US/Eastern')).strftime(fmt)
-                    tw_data['status_id'] = str(all_data["id"])
+                    # tw_data['status_id'] = str(all_data["id"])
 
                     tw_data['retweet_count'] = str(all_data['retweet_count'])
                     tw_data['favorite_count'] = str(all_data['favorite_count'])

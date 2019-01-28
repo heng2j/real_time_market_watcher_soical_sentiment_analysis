@@ -23,7 +23,7 @@ import sys
 import configparser
 
 
-projectPath = up(os.getcwd())
+# projectPath = up(os.getcwd())
 src_path = up(up(os.getcwd()))
 sys.path.append(src_path)
 
@@ -42,6 +42,7 @@ from dateutil import parser
 
 # Internal Modules
 from src.models import news
+from src.data_tools import getSQL_DB_Engine
 
 
 # Helper class to convert a DynamoDB item to JSON.
@@ -105,30 +106,30 @@ symbolsList = ['AAPL',
                'XOM',
                'XRX']
 
-
-def getSQL_DB_Engine( filePath=None):
-    """
-
-    :param filePath: DB configs ini file path
-    :return: SQLalchemy database engine
-    """
-
-    config = configparser.ConfigParser()
-    config.read(filePath)
-
-    DB_TYPE = config['DB_Configs']['DB_TYPE']
-    DB_DRIVER = config['DB_Configs']['DB_DRIVER']
-    DB_USER = config['DB_Configs']['DB_USER']
-    DB_PASS = config['DB_Configs']['DB_PASS']
-    DB_HOST = config['DB_Configs']['DB_HOST']
-    DB_PORT = config['DB_Configs']['DB_PORT']
-    DB_NAME = config['DB_Configs']['DB_NAME']
-    SQLALCHEMY_DATABASE_URI = '%s+%s://%s:%s@%s:%s/%s' % (DB_TYPE, DB_DRIVER, DB_USER,
-                                                          DB_PASS, DB_HOST, DB_PORT, DB_NAME)
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URI, echo=False)
-
-    return engine
+#
+# def getSQL_DB_Engine( filePath=None):
+#     """
+#
+#     :param filePath: DB configs ini file path
+#     :return: SQLalchemy database engine
+#     """
+#
+#     config = configparser.ConfigParser()
+#     config.read(filePath)
+#
+#     DB_TYPE = config['DB_Configs']['DB_TYPE']
+#     DB_DRIVER = config['DB_Configs']['DB_DRIVER']
+#     DB_USER = config['DB_Configs']['DB_USER']
+#     DB_PASS = config['DB_Configs']['DB_PASS']
+#     DB_HOST = config['DB_Configs']['DB_HOST']
+#     DB_PORT = config['DB_Configs']['DB_PORT']
+#     DB_NAME = config['DB_Configs']['DB_NAME']
+#     SQLALCHEMY_DATABASE_URI = '%s+%s://%s:%s@%s:%s/%s' % (DB_TYPE, DB_DRIVER, DB_USER,
+#                                                           DB_PASS, DB_HOST, DB_PORT, DB_NAME)
+#     engine = create_engine(
+#         SQLALCHEMY_DATABASE_URI, echo=False)
+#
+#     return engine
 
 
 
@@ -142,11 +143,11 @@ if __name__ == '__main__':
     # Set up DB configs file path
 
 
-    DB_configs_ini_file_path = projectPath + "/DB/db_configs.ini"
+    # DB_configs_ini_file_path = projectPath + "/DB/db_configs.ini"
 
-    print("DB_configs_ini_file_path: ", DB_configs_ini_file_path)
+    # print("DB_configs_ini_file_path: ", DB_configs_ini_file_path)
 
-    DB_engine = getSQL_DB_Engine(DB_configs_ini_file_path)
+    DB_engine = getSQL_DB_Engine()
 
     while True:
         for symbol in symbolsList:

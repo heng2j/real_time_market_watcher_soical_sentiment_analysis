@@ -16,10 +16,25 @@ import time
 from decimal import Decimal
 import json
 from argparse import ArgumentParser
+import sys
+import os
+from os.path import dirname as up
+
+# projectPath = up(os.getcwd())
+src_path = os.getcwd()
+sys.path.append(src_path)
+
+# print(src_path)
 
 # 3rd party modules
 import boto3
 from botocore.exceptions import ClientError
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+
+
+# Internal Modules
+from src.models import tweet
+from src.data_tools import getSQL_DB_Engine
 
 
 class KinesisConsumer:
@@ -90,6 +105,19 @@ class saveStreamDataToDynamoDB(KinesisConsumer):
             all_data = json.loads(json.dumps(all_data), parse_float=Decimal)
 
 
+            print("all_data: ", all_data)
+            stmt = pg_insert(tweet).values(all_data)
+
+
+            try:
+                r = DB_engine.execute(stmt)
+            except Exception as e:
+
+                if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
+                    raise
+
+
+
 
             dynamodb = boto3.resource('dynamodb')
             table = dynamodb.Table(self.table_name)
@@ -123,6 +151,9 @@ if __name__ == '__main__':
     stream_name = args.streamName
     table_name = args.tableName
 
+
+    # Set up DB_engine
+    DB_engine = getSQL_DB_Engine()
 
 
     kinesis = boto3.client('kinesis')
