@@ -3,31 +3,41 @@
 """
 
 
-# IMPORTED LIBRARIES
-from dynamodb_json import json_util as dbjson
+## IMPORTED LIBRARIES
 
-import boto3 as boto3
 import dash as da
 import dash.dependencies as dep
 import dash_core_components as dcc
-
 import dash_html_components as html
-import datetime as dt
-import os
-import pandas as pd
 import plotly.graph_objs as go
+
+# Interface for environment variable input
+import os
+
+# Manipulate PostgreSQL/TimescaleDB data as Pandas dataframe
+import pandas as pd
+
+# Enable driver for PostgreSQL connection objects
+import psycopg2
+
+# Enable database interactions
+import sqlalchemy as sqla
+
+# Enable dedentation of multi-line strings
 import textwrap as tw
 
 
-# GLOBAL PARAMETERS
-ACCESS_KEY = os.environ["HENG_AWS_ACCESS_KEY_ID"]
-SECRET_KEY = os.environ["HENG_AWS_SECRET_ACCESS_KEY"]
+## GLOBAL PARAMETERS
+PSQL_USER = os.environ["HENG_TIMESCALE_DB_USER"]
+PSQL_PASS = os.environ["HENG_TIMESCALE_DB_PASS"]
+PSQL_HOST = os.environ["HENG_TIMESCALE_DB_HOST"]
+PSQL_PORT = os.environ["HENG_TIMESCALE_DB_PORT"]
+PSQL_NAME = os.environ["HENG_TIMESCALE_DB_NAME"]
 
-# Create AWS DynamoDB session
-dynamodb = boto3.Session(aws_access_key_id=ACCESS_KEY,
-                         aws_secret_access_key=SECRET_KEY,
-                         region_name = "us-east-1") \
-           .client("dynamodb")
+# Create PostgreSQL/TimescaleDB session
+psql = sqla \
+       .create_engine(f"postgresql+psycopg2://{PSQL_USER}:{PSQL_PASS}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_NAME}") \
+       .connect()
 
 # Sets Dash application parameters
 app = da.Dash("Charge_Tracker",
@@ -59,39 +69,32 @@ app.layout = html.Div([
         "height": "auto", }
 )
 
-
 ## FUNCTION DEFINITIONS
-def query_dynamodb_stocks(symbol, end_datetime, start_datetime):
+
+def query_postgres_stocks(symbol, start_datetime, end_datetime):
     """
-    Queries Cassandra database according to input CQL statement.
+    Queries PostgreSQL/TimescaleDB database according to input query parameters.
     """
-    # Calculate start datetime
-    # start_datetime = end_datetime - dt.timedelta(minutes=window_minutes)
+    # Create and execute SQL query
+    query = """
+            SELECT
+                symbol,
+                companyName,
+                latestTime,
+                movementVolume
+            FROM
+                stock_market_data
+            WHERE
+                symbol = '{}' AND
+                latestTime BETWEEN '{}' AND '{}'
+            ORDER BY
+                latestTime
+                    ASC
+            """ \
+            .format(symbol, start_datetime, end_datetime)
+    result = psql.execute(query)
 
-    # Convert start and end datetimes to formatted string representation
-    # start_datetime = start_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    # end_datetime = end_datetime.strftime("%Y-%m-%d %H:%M:%S")
-
-    # Collect query result
-    result = dynamodb.query(TableName = "StockTradesProcessor",
-                            Select = "SPECIFIC_ATTRIBUTES",
-                            ProjectionExpression = "symbol, latestTime, companyName, movementVolume",
-                            ExpressionAttributeValues = {":v1": {"S": symbol},
-                                                         ":v2": {"S": start_datetime},
-                                                         ":v3": {"S": end_datetime},},
-                            KeyConditionExpression = "symbol = :v1 AND latestTime BETWEEN :v2 AND :v3",)
-     
-    # Extract query results
-    if "Items" in result:
-        df_stocks = pd.DataFrame(dbjson.loads(result["Items"]))
-    else:
-        df_stocks = pd.DataFrame(dbjson.loads(result["Item"]))
-
-    # Convert datetime strings to datetime object representation
-    # df_stocks["latestTime"] = pd.to_datetime(df_stocks["latestTime"],
-    #                                         format = "%Y-%m-%d %H:%M:%S")
-
-    return df_stocks
+    return pd.DataFrame([i for i in result])
 
 # Callback updates graph (OUTPUT) according to time interval (INPUT)
 @app.callback(dep.Output("sentiment_volume_change", "figure"),
@@ -101,28 +104,19 @@ def update_graph(interval):
     Queries table, analyzes data, and assembles results in Dash format.
     """
     # TODO: Replace hardcoded results with dcc callbacks
-    df_stocks = query_dynamodb_stocks("BA", "01/28/2019 16:17:43", "01/28/2019 16:02:43")
+    df_stocks = query_postgres_stocks("BA", "2019-01-28 18:05:03-05", "2019-01-28 19:00:00-05")
 
     # Creates scatter data for real-time graph
     plot_stocks = go.Scatter(x = df_stocks["latestTime"],
                              y = df_stocks["movementVolume"],
-                             #hoverinfo = "text",
-                             #legendgroup = "Group {}".format(c),
-                             #line = {"color": colors[c][0]},
-                             #mode = "lines+markers",
-                             #name = "Group {}".format(c),
-                             #text = mouseover_text,
                         )
 
     data = [plot_stocks]
 
-    # Sets layout
-    
+    # Sets Dashboard figure layout
     layout = go.Layout(hovermode = "closest",
                        legend = {"orientation": "h"},
                        margin = {"l": 100, "b": 40, "t": 10, "r": 10},
-                       #paper_bgcolor = "rgb(255,255,255)",
-                       #plot_bgcolor = "rgb(229,229,229)",
                        xaxis = {"title": "Date",
                                 "gridcolor": "rgb(255,255,255)",
                                 "showgrid": True,
@@ -143,7 +137,7 @@ def update_graph(interval):
     return go.Figure(data = data, layout = layout)
 
 
-# MAIN MODULE
+## MAIN MODULE
 if __name__ == "__main__":
     app.run_server(debug = False,
                    host = "0.0.0.0",
