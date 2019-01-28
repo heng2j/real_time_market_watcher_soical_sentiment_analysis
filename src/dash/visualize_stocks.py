@@ -36,8 +36,8 @@ server = app.server
 app.layout = html.Div([
     html.Div([
         dcc.Markdown(tw.dedent("""
-                **Sentiment volume change**
-                Calculates number of tweets in current 15 minute window relative to previous 15 minute window.
+                **Movement volume change**
+                Reports the movement volume change of stock in 15 minute window.
                 Updates every minute.
             """)),
         dcc.Graph(
@@ -61,16 +61,16 @@ app.layout = html.Div([
 
 
 ## FUNCTION DEFINITIONS
-def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
+def query_dynamodb_stocks(symbol, end_datetime, start_datetime):
     """
     Queries Cassandra database according to input CQL statement.
     """
     # Calculate start datetime
-    start_datetime = end_datetime - dt.timedelta(minutes=window_minutes)
+    # start_datetime = end_datetime - dt.timedelta(minutes=window_minutes)
 
     # Convert start and end datetimes to formatted string representation
-    start_datetime = start_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    end_datetime = end_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    # start_datetime = start_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    # end_datetime = end_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
     # Collect query result
     result = dynamodb.query(TableName = "StockTradesProcessor",
@@ -80,7 +80,7 @@ def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
                                                          ":v2": {"S": start_datetime},
                                                          ":v3": {"S": end_datetime},},
                             KeyConditionExpression = "symbol = :v1 AND latestTime BETWEEN :v2 AND :v3",)
-
+     
     # Extract query results
     if "Items" in result:
         df_stocks = pd.DataFrame(dbjson.loads(result["Items"]))
@@ -88,8 +88,8 @@ def query_dynamodb_stocks(symbol, end_datetime, window_minutes):
         df_stocks = pd.DataFrame(dbjson.loads(result["Item"]))
 
     # Convert datetime strings to datetime object representation
-    df_stocks["latestTime"] = pd.to_datetime(df_stocks["latestTime"],
-                                             format = "%Y-%m-%d %H:%M:%S")
+    # df_stocks["latestTime"] = pd.to_datetime(df_stocks["latestTime"],
+    #                                         format = "%Y-%m-%d %H:%M:%S")
 
     return df_stocks
 
@@ -101,7 +101,7 @@ def update_graph(interval):
     Queries table, analyzes data, and assembles results in Dash format.
     """
     # TODO: Replace hardcoded results with dcc callbacks
-    df_stocks = query_dynamodb_stocks("AAPL", dt.datetime(2019, 1, 3, 15, 5, 44), 15)
+    df_stocks = query_dynamodb_stocks("BA", "01/28/2019 16:17:43", "01/28/2019 16:02:43")
 
     # Creates scatter data for real-time graph
     plot_stocks = go.Scatter(x = df_stocks["latestTime"],
@@ -117,9 +117,10 @@ def update_graph(interval):
     data = [plot_stocks]
 
     # Sets layout
+    
     layout = go.Layout(hovermode = "closest",
                        legend = {"orientation": "h"},
-                       margin = {"l": 40, "b": 40, "t": 10, "r": 10},
+                       margin = {"l": 100, "b": 40, "t": 10, "r": 10},
                        #paper_bgcolor = "rgb(255,255,255)",
                        #plot_bgcolor = "rgb(229,229,229)",
                        xaxis = {"title": "Date",
@@ -130,7 +131,7 @@ def update_graph(interval):
                                 "tickcolor": "rgb(127,127,127)",
                                 "ticks": "outside",
                                 "zeroline": False},
-                       yaxis = {"title": "Calculated energy  (Wh)",
+                       yaxis = {"title": "Movement volume",
                                 "gridcolor": "rgb(255,255,255)",
                                 "showgrid": True,
                                 "showline": False,
