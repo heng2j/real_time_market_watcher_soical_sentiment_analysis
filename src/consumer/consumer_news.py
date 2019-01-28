@@ -24,7 +24,7 @@ import configparser
 
 
 # projectPath = up(os.getcwd())
-src_path = up(up(os.getcwd()))
+src_path = os.getcwd()
 sys.path.append(src_path)
 
 
